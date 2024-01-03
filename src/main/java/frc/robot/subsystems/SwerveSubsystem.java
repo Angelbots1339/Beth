@@ -4,20 +4,21 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.drive.SwerveConfiguration;
 import frc.robot.subsystems.drive.SwerveModule;
 
-public class DriveSubsystem extends SubsystemBase {
+public class SwerveSubsystem extends SubsystemBase {
     private final SwerveModule frontLeft;
     private final SwerveModule frontRight;
     private final SwerveModule backLeft;
     private final SwerveModule backRight;
     private final SwerveDriveKinematics m_kinematics;
 
-    public DriveSubsystem() {
-        frontLeft = new SwerveModule(SwerveModule.SwerveConfiguration.FRONT_LEFT);
-        frontRight = new SwerveModule(SwerveModule.SwerveConfiguration.FRONT_RIGHT);
-        backLeft = new SwerveModule(SwerveModule.SwerveConfiguration.BACK_LEFT);
-        backRight = new SwerveModule(SwerveModule.SwerveConfiguration.BACK_RIGHT);
+    public SwerveSubsystem() {
+        frontLeft = new SwerveModule(SwerveConfiguration.FRONT_LEFT);
+        frontRight = new SwerveModule(SwerveConfiguration.FRONT_RIGHT);
+        backLeft = new SwerveModule(SwerveConfiguration.BACK_LEFT);
+        backRight = new SwerveModule(SwerveConfiguration.BACK_RIGHT);
 
         m_kinematics = new SwerveDriveKinematics(
                 frontLeft.getPosition(),
@@ -27,6 +28,10 @@ public class DriveSubsystem extends SubsystemBase {
         );
     }
 
+    public SwerveModule[] getModules() {
+        return new SwerveModule[]{frontLeft, frontRight, backLeft, backRight};
+    }
+
     public void robotInit() {
         frontLeft.init();
         frontRight.init();
@@ -34,11 +39,11 @@ public class DriveSubsystem extends SubsystemBase {
         backRight.init();
     }
 
-    public void runSwerve(ChassisSpeeds speeds) {
+    public void apply(ChassisSpeeds speeds) {
         SwerveModuleState[] states = m_kinematics.toSwerveModuleStates(speeds);
-        frontLeft.setState(states[0]);
-        frontRight.setState(states[1]);
-        backLeft.setState(states[2]);
-        backRight.setState(states[3]);
+        frontLeft.apply(states[0]);
+        frontRight.apply(states[1]);
+        backLeft.apply(states[2]);
+        backRight.apply(states[3]);
     }
 }

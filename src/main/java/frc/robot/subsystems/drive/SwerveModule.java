@@ -13,80 +13,22 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 public class SwerveModule {
-    private final CANSparkMax move;
-    private final CANSparkMax rotate;
-    private final WPI_CANCoder encoder;
-    private final SwerveConfiguration swerveConfiguration;
-    private final PIDController pidController;
-
-    public enum SwerveConfiguration {
-        FRONT_LEFT(
-                "Front Left",
-                new Translation2d(-0.25, 0.25),
-                13,
-                18,
-                8,
-                -95
-        ),
-        FRONT_RIGHT(
-                "Front Right",
-                new Translation2d(0.25, 0.25),
-                12,
-                15,
-                9,
-                -177
-        ),
-        BACK_LEFT(
-                "Back Left",
-                new Translation2d(-0.25, -0.25),
-                20,
-                17,
-                6,
-                56
-        ),
-        BACK_RIGHT(
-                "Back Right",
-                new Translation2d(0.25, -0.25),
-                30,
-                14,
-                7,
-                -71
-        );
-
-        // If gears face inward on wheels at offset, then move motion should be inverted for left from right
-
-        public final String name;
-        public final Translation2d position;
-        public final int moveCANSparkMaxId;
-        public final int rotateCANSparkMaxId;
-        public final int canCoderId;
-        public final double magneticOffset;
-
-        SwerveConfiguration(
-                String name,
-                Translation2d position,
-                int moveCANSparkMaxId,
-                int rotateCANSparkMaxId,
-                int CANCoderId,
-                double magneticOffset
-        ) {
-            this.name = name;
-            this.position = position;
-            this.moveCANSparkMaxId = moveCANSparkMaxId;
-            this.rotateCANSparkMaxId = rotateCANSparkMaxId;
-            this.canCoderId = CANCoderId;
-            this.magneticOffset = magneticOffset;
-        }
-    }
+    public final CANSparkMax moveMotor;
+    public final CANSparkMax rotateMotor;
+    public final WPI_CANCoder rotationEncoder;
+    public final SwerveConfiguration swerveConfiguration;
+    public final PIDController pidController;
+    public final SwerveConfiguration config;
 
     public SwerveModule(
             SwerveConfiguration swerveConfiguration
     ) {
-        this.move = new CANSparkMax(swerveConfiguration.moveCANSparkMaxId, CANSparkMaxLowLevel.MotorType.kBrushless);
-        this.rotate = new CANSparkMax(swerveConfiguration.rotateCANSparkMaxId, CANSparkMaxLowLevel.MotorType.kBrushless);
-        this.encoder = new WPI_CANCoder(swerveConfiguration.canCoderId);
+        this.config = swerveConfiguration;
+        this.moveMotor = new CANSparkMax(swerveConfiguration.moveCANSparkMaxId, CANSparkMaxLowLevel.MotorType.kBrushless);
+        this.rotateMotor = new CANSparkMax(swerveConfiguration.rotateCANSparkMaxId, CANSparkMaxLowLevel.MotorType.kBrushless);
+        this.rotationEncoder = new WPI_CANCoder(swerveConfiguration.canCoderId);
         this.swerveConfiguration = swerveConfiguration;
-        this.pidController = new PIDController(0.01, 0.000001, 0);
+        this.pidController = new PIDController(0.01, 0, 0.0001);
     }
 
     public Translation2d getPosition() {
@@ -94,19 +36,18 @@ public class SwerveModule {
     }
 
     public void init() {
-        setupCANSparkMax(this.move);
-//        move.setInverted(swerveConfiguration.moveMotorInverted);
+        setupCANSparkMax(this.moveMotor);
+        moveMotor.setInverted(false);
 
-        setupCANSparkMax(this.rotate);
-        rotate.setInverted(true);
+        setupCANSparkMax(this.rotateMotor);
+        rotateMotor.setInverted(true);
 
         CANCoderConfiguration _canCoderConfiguration = new CANCoderConfiguration();
         _canCoderConfiguration.unitString = "deg";
         _canCoderConfiguration.absoluteSensorRange = AbsoluteSensorRange.Signed_PlusMinus180;
-//        _canCoderConfiguration.sensorDirection = true;
 
-        encoder.configAllSettings(_canCoderConfiguration);
-        encoder.configMagnetOffset(swerveConfiguration.magneticOffset);
+        rotationEncoder.configAllSettings(_canCoderConfiguration);
+        rotationEncoder.configMagnetOffset(swerveConfiguration.magneticOffset);
 
         pidController.enableContinuousInput(-180, 180);
         pidController.setTolerance(5, 10);
@@ -120,8 +61,8 @@ public class SwerveModule {
         sparkMax.enableVoltageCompensation(12);
     }
 
-    public void setState(SwerveModuleState state) {
-        double encoderAbsolutePosition = encoder.getAbsolutePosition();
+    public void apply(SwerveModuleState state) {
+        double encoderAbsolutePosition = rotationEncoder.getAbsolutePosition();
         Rotation2d position = Rotation2d.fromDegrees(encoderAbsolutePosition);
         state = SwerveModuleState.optimize(state, position);
 
@@ -134,10 +75,10 @@ public class SwerveModule {
         SmartDashboard.putNumber(String.format("%s pid", swerveConfiguration.name), pid);
         SmartDashboard.putNumber(String.format("%s pid error", swerveConfiguration.name), pidController.getPositionError());
         if (!pidController.atSetpoint()) {
-            rotate.set(pid);
+            rotateMotor.set(pid);
         }
 
         // TODO convert meters per second into motor speed and adjust clamp to be based on that
-        move.set(mps);
+        moveMotor.set(mps);
     }
 }

@@ -10,14 +10,13 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.RobotInitCommand;
-import frc.robot.commands.SwerveCommand;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.commands.swervesetup.*;
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.PowerSubsystem;
 
 import java.util.function.Supplier;
@@ -32,9 +31,9 @@ import java.util.function.Supplier;
 public class RobotContainer {
     private final Pigeon2 pigeon2;
     private final PowerSubsystem powerSubsystem;
-    private final DriveSubsystem driveSubsystem;
+    private final SwerveSubsystem swerveSubsystem;
 
-    public final SwerveCommand swerveCommand;
+//    public final SwerveCommand swerveCommand;
 
     private final CommandXboxController m_driverController;
     private Rotation2d lastAngle = new Rotation2d();
@@ -50,21 +49,10 @@ public class RobotContainer {
         m_driverController = new CommandXboxController(OperatorConstants.kDriverControllerPort);
 
         powerSubsystem = new PowerSubsystem();
-        driveSubsystem = new DriveSubsystem();
+        swerveSubsystem = new SwerveSubsystem();
 
-        Supplier<Rotation2d> joystickRotationAngle = () -> {
-            double rightX = m_driverController.getRightX();
-            double rightY = -m_driverController.getRightY();
-            SmartDashboard.putNumber("right X", rightX);
-            SmartDashboard.putNumber("right Y", rightY);
+        Supplier<Double> joystickRobotSpin = () -> -MathUtil.applyDeadband(m_driverController.getRightX(), 0.1);
 
-            double radialDeadband = Math.sqrt(Math.pow(rightX, 2) + Math.pow(rightY, 2));
-            if (radialDeadband < 0.75) {
-                return lastAngle;
-            }
-            lastAngle = new Rotation2d(rightX, rightY).minus(new Rotation2d(Math.PI / 2));
-            return lastAngle;
-        };
         Supplier<Rotation2d> robotHeadingAngle = () -> {
             double yaw = pigeon2.getYaw();
             while (yaw >= 360.0) {
@@ -75,26 +63,28 @@ public class RobotContainer {
             }
             return Rotation2d.fromDegrees(yaw);
         };
-        Supplier<Translation2d> robotMovement = () -> {
-            double x = MathUtil.applyDeadband(m_driverController.getLeftX(), 0.2);
-            double y = MathUtil.applyDeadband(-m_driverController.getLeftY(), 0.2);
-            SmartDashboard.putNumber("left X", x);
-            SmartDashboard.putNumber("left Y", y);
-            return new Translation2d(
-                    x,
-                    y
-            );
-        };
-        swerveCommand = new SwerveCommand(
-                driveSubsystem,
-                robotHeadingAngle,
-                joystickRotationAngle,
-                robotMovement
+        Supplier<Translation2d> joystickRobotMovement = () -> new Translation2d(
+                -MathUtil.applyDeadband(m_driverController.getLeftY(), 0.2),
+                -MathUtil.applyDeadband(m_driverController.getLeftX(), 0.2)
         );
+//        swerveCommand = new SwerveCommand(
+//                driveSubsystem,
+//                robotHeadingAngle,
+//                joystickRobotSpin,
+//                robotMovement
+//        );
 
         // Configure the trigger bindings
         configureBindings();
-        CommandScheduler.getInstance().setDefaultCommand(driveSubsystem, swerveCommand);
+//        CommandScheduler.getInstance().setDefaultCommand(driveSubsystem, swerveCommand);
+        swerveSubsystem.setDefaultCommand(
+                new Step6TuningSpeed(
+                        swerveSubsystem,
+                        robotHeadingAngle,
+                        joystickRobotSpin,
+                        joystickRobotMovement
+                )
+        );
     }
 
     /**
@@ -135,7 +125,7 @@ public class RobotContainer {
 
     public RobotInitCommand getRobotInitCommand() {
         return new RobotInitCommand(
-                driveSubsystem,
+                swerveSubsystem,
                 powerSubsystem
         );
     }

@@ -1,19 +1,19 @@
 package frc.robot.commands;
 
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.PowerSubsystem;
 
 public class RobotInitCommand extends CommandBase {
     private boolean isFinished = false;
-    private final DriveSubsystem driveSubsystem;
+    private final SwerveSubsystem swerveSubsystem;
     private final PowerSubsystem powerSubsystem;
 
     public RobotInitCommand(
-            DriveSubsystem driveSubsystem,
+            SwerveSubsystem swerveSubsystem,
             PowerSubsystem powerSubsystem
     ) {
-        this.driveSubsystem = driveSubsystem;
+        this.swerveSubsystem = swerveSubsystem;
         this.powerSubsystem = powerSubsystem;
         addRequirements(this.powerSubsystem);
     }
@@ -25,7 +25,7 @@ public class RobotInitCommand extends CommandBase {
 
     @Override
     public void execute() {
-        driveSubsystem.robotInit();
+        swerveSubsystem.robotInit();
         powerSubsystem.robotInit();
         isFinished = true;
     }
