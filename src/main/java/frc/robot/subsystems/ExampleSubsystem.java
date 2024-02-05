@@ -11,7 +11,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class ExampleSubsystem extends SubsystemBase {
@@ -77,7 +77,7 @@ public class ExampleSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public CommandBase startMotor() {
+  public Command startMotor() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(
@@ -93,7 +93,7 @@ public class ExampleSubsystem extends SubsystemBase {
    *
    * @return a command
    */
-  public CommandBase stopMotor() {
+  public Command stopMotor() {
     // Inline construction of command goes here.
     // Subsystem::RunOnce implicitly requires `this` subsystem.
     return runOnce(

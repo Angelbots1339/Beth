@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.PowerSubsystem;
 
-public class RobotInitCommand extends CommandBase {
+public class RobotInitCommand extends Command {
     private boolean isFinished = false;
     private final SwerveSubsystem swerveSubsystem;
     private final PowerSubsystem powerSubsystem;

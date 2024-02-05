@@ -3,7 +3,7 @@ package frc.robot.commands.swervesetup;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 import frc.robot.subsystems.drive.SwerveModule;
 
@@ -59,7 +59,7 @@ import frc.robot.subsystems.drive.SwerveModule;
  * all the weight of the robot is put on those wheels, it may change your response values,  and you may have to run
  * through these tuning steps again. Luckily most of the tuning can be done purely based on the dashboard outputs.
  */
-public class Step2RotationTuning extends CommandBase {
+public class Step2RotationTuning extends Command {
     static final int PAUSE_COUNT = 10_000 / 20;  // 10 seconds split into 20 ms chunks
     private final SwerveSubsystem swerveSubsystem;
     private int counter = 0;

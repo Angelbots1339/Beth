@@ -2,7 +2,7 @@ package frc.robot.commands.swervesetup;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import java.util.function.Supplier;
@@ -41,7 +41,7 @@ import java.util.function.Supplier;
  * <p>
  * As I said though, that last section is a bit out of scope of this step in getting swerve to work, but useful to know.
  */
-public class Step5RobotHeading extends CommandBase {
+public class Step5RobotHeading extends Command {
 
     private final SwerveSubsystem swerveSubsystem;  // Unused but kept here for consistency
     private final Supplier<Rotation2d> headingSupplier;

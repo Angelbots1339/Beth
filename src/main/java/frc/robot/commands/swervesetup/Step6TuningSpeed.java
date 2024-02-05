@@ -4,7 +4,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.SwerveSubsystem;
 
 import java.util.function.Supplier;
@@ -58,7 +58,7 @@ import java.util.function.Supplier;
  * Ultimately the goal of these steps was to get a working swerve module. The last thing to do is make your DriveCommand
  * for teleop based drive control.
  */
-public class Step6TuningSpeed extends CommandBase {
+public class Step6TuningSpeed extends Command {
     private static final double SPEED_MULTIPLIER = 3;
     private static final double SPIN_ROTATIONS_PER_SECOND = Math.PI / 2;
 
